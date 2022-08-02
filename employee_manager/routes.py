@@ -1,9 +1,6 @@
-from flask import Flask, render_template, url_for, flash, redirect
-from forms import *
-app = Flask(__name__)
-
-app.config['SECRET_KEY'] = 'bf44ed945ec08fb0b84b1c7b9aed0325'
-
+from flask import render_template, url_for, flash, redirect
+from employee_manager import app
+from employee_manager.forms import *
 
 @app.route("/")
 @app.route("/welcome")
@@ -32,7 +29,3 @@ def login():
     #     else:
     #         flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('login.html', title='Login', form=form)
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
