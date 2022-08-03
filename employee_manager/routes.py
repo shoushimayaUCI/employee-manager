@@ -1,6 +1,7 @@
 from flask import render_template, url_for, flash, redirect
-from employee_manager import app
-from employee_manager.forms import *
+from employee_manager import app, db, bcrypt
+from employee_manager.forms import RegistrationForm, LoginForm
+from employee_manager.models import User
 
 @app.route("/")
 @app.route("/welcome")
@@ -15,8 +16,11 @@ def about():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        db.session.add(User(username=form.username.data, email=form.email.data, password=hashed_password))
+        db.session.commit()
         flash(f'Account created for {form.username.data}!', 'success')
-        return redirect(url_for('welcome'))
+        return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
 @app.route("/login", methods=['GET', 'POST'])
