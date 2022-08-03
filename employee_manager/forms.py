@@ -3,13 +3,15 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from employee_manager.models import User
 
-
+# add team functionality later
 class RegistrationForm(FlaskForm):
 	username = StringField('Username', 
 		validators=[DataRequired(), Length(min=2, max=20)])
 	email = StringField('Email',
 		validators=[DataRequired(), Email()])
 	password = PasswordField('Password', validators=[DataRequired()])
+	title = StringField('Job title',
+		validators=[DataRequired(), Length(min=2, max=50)])
 	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
 	submit = SubmitField('Sign up')
 
