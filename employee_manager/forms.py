@@ -15,14 +15,13 @@ class RegistrationForm(FlaskForm):
 	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
 	submit = SubmitField('Sign up')
 
-	def validate_username(self, username):
-		user = User.query.filter_by(username=username.data).first()
-		if user:
+# function name has to be in this form, and it will be run when validate_on_submit is called from routes.py
+	def validate_username(self, username): 
+		if User.query.filter_by(username=username.data).first():
 			raise ValidationError('username already exists')
 
 	def validate_email(self, email):
-		user = User.query.filter_by(email=email.data).first()
-		if user:
+		if User.query.filter_by(email=email.data).first():
 			raise ValidationError('email already exists')
 
 
@@ -33,5 +32,6 @@ class LoginForm(FlaskForm):
 	remember = BooleanField('Remember Me')
 	submit = SubmitField('Login')
 
-
-# When do validate_... functions run?
+	def validate_email(self, email):
+		if not User.query.filter_by(email=email.data).first():
+			raise ValidationError('email does not exist')
