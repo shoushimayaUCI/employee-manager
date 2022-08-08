@@ -6,28 +6,38 @@ import os
 
 from employee_manager import app, db, bcrypt
 from employee_manager.forms import *
-from employee_manager.models import User
+from employee_manager.models import *
 
 @app.route("/")
 @app.route("/welcome")
 def welcome():
     return render_template('welcome.html')
 
+
+@app.route("/home")
+@login_required
+def home():
+    return render_template('home.html', tasks=Task.query.filter_by(person=current_user.email))
+
 @app.route("/about")
 def about():
     return render_template('about.html', title='About')
+
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        db.session.add(User(username=form.username.data, 
-            email=form.email.data, title=form.title.data, password=hashed_password))
+        if not form.team_id.data:
+            form.team_id.data = "newbie"
+        db.session.add(User(username=form.username.data, email=form.email.data, 
+            title=form.title.data, team_id=form.team_id.data, password=hashed_password))
         db.session.commit()
         flash(f'Account created for {form.username.data}!', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -37,7 +47,7 @@ def login():
         if bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('welcome'))
+            return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('login.html', title='Login', form=form)
@@ -45,6 +55,7 @@ def login():
 @app.route("/logout")
 def logout():
     logout_user()
+    flash('Logout Successful')
     return redirect(url_for('welcome'))
 
 
@@ -72,6 +83,7 @@ def account():
         current_user.username = form.username.data
         current_user.title = form.title.data
         current_user.email = form.email.data
+        current_user.team_id = form.team_id.data
         db.session.commit()
         flash('your account has been updated', category='success')
         return redirect(url_for('account'))
@@ -79,5 +91,21 @@ def account():
         form.username.data = current_user.username
         form.title.data = current_user.title
         form.email.data = current_user.email
+        form.team_id.data = current_user.team_id
     image_file = url_for('static', filename='profile-pics/'+current_user.image_file)
     return render_template('account.html', title='Account', form=form, image_file=image_file)
+
+
+@app.route("/new_task", methods=['GET', 'POST'])
+@login_required
+def new_task():
+    form = NewTaskForm()
+    if form.validate_on_submit():
+        if not form.person.data:
+            form.person.data = current_user.email
+        db.session.add(Task(title=form.title.data, description=form.description.data, 
+            person=form.person.data))
+        db.session.commit()
+        flash('The task has been created!', 'success')
+        return redirect(url_for('home'))
+    return render_template('new_task.html', form=form)
