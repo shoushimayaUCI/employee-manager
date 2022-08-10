@@ -1,5 +1,8 @@
-from employee_manager import db, login_manager
+from datetime import datetime
 from flask_login import UserMixin, current_user
+
+from employee_manager import db, login_manager
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -28,3 +31,15 @@ class Task(db.Model):
     title = db.Column(db.String(50))
     description = db.Column(db.Text())
     person = db.Column(db.String(120), db.ForeignKey('user.email'), nullable=False)
+
+    def __repr__(self):
+        return f"Task('{self.title}', '{self.person}')"
+
+
+class Announcement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(50))
+    author = db.Column(db.String(50), db.ForeignKey('user.email'), nullable=False)
+    description = db.Column(db.Text())
+    date_post = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    team = db.Column(db.String(50), db.ForeignKey('team.team_name'), nullable=False)

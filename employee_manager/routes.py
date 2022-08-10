@@ -1,5 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request
 from flask_login import login_user, logout_user, current_user, login_required
+from sqlalchemy.orm import aliased
 import secrets
 from PIL import Image
 import os 
@@ -109,3 +110,25 @@ def new_task():
         flash('The task has been created!', 'success')
         return redirect(url_for('home'))
     return render_template('new_task.html', form=form)
+
+
+@app.route("/announcements")
+@login_required
+def announcements():
+    subquery = db.session.query(Announcement).filter(Announcement.team==current_user.team_id)
+    return render_template('announcements.html', announcements=subquery.all())
+
+
+@app.route("/new_announcement", methods=['GET', 'POST'])
+@login_required
+def new_announcement():
+    form = AnnouncementForm()
+    if form.validate_on_submit():
+        if not form.team.data:
+            form.team.data = current_user.team_id
+        db.session.add(Announcement(title=form.title.data, author=current_user.email,
+            description=form.description.data, team=form.team.data))
+        db.session.commit()
+        flash('You successfully made an announcement!', 'success')
+        return redirect(url_for('announcements'))
+    return render_template('new_announcement.html', form=form)
