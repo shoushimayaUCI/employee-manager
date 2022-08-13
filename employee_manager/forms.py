@@ -86,3 +86,14 @@ class AnnouncementForm(FlaskForm):
 	def validate_team(self, team):
 		if team.data and not Team.query.filter_by(team_name=team.data).first():
 			raise ValidationError('team not found')
+
+
+class TeamForm(FlaskForm):
+	team_id = StringField('Team Id', validators=[DataRequired(), Length(max=50)])
+	team_name = StringField('Team Name', validators=[DataRequired(), Length(max=50)])
+	submit = SubmitField('Create Team')
+
+	def validate_team_id(self, team_id):
+		if Team.query.filter_by(team_id=team_id.data).first():
+			raise ValidationError('Team Id Taken')
+

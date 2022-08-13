@@ -42,4 +42,4 @@ class Announcement(db.Model):
     author = db.Column(db.String(50), db.ForeignKey('user.email'), nullable=False)
     description = db.Column(db.Text())
     date_post = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    team = db.Column(db.String(50), db.ForeignKey('team.team_name'), nullable=False)
+    team = db.Column(db.String(50), db.ForeignKey('team.team_id'), nullable=False)

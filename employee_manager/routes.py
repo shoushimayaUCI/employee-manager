@@ -132,3 +132,15 @@ def new_announcement():
         flash('You successfully made an announcement!', 'success')
         return redirect(url_for('announcements'))
     return render_template('new_announcement.html', form=form)
+
+
+@app.route("/new_team", methods=['GET', 'POST'])
+@login_required
+def new_team():
+    form = TeamForm()
+    if form.validate_on_submit():
+        db.session.add(Team(team_id=form.team_id.data, team_name=form.team_name.data))
+        db.session.commit()
+        flash('You successfully made a team!', 'success')
+        return redirect(url_for('home'))
+    return render_template('new_team.html', form=form)
