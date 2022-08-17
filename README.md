@@ -1,3 +1,8 @@
 # employee-manager
 
-Sorry I'm still trying to figure out how to make it runnable by others
+Functionalities:
+  Allows you to create account, login, join a team, assign tasks to a teammate or yourself, and make an announcement to a team.
+  
+To do:
+  Better view for homepage
+  Build microservices
