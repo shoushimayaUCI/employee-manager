@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
+    <h1>Announcements        <a href="{{ url_for('new_announcement') }}">
+    <button>Make announcement</button></a></h1>
     {% for announcement in announcements %}
         <article class="media content-section">
           <div class="media-body">

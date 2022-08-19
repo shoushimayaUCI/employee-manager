@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
+    <h1>My Tasks        <a href="{{ url_for('new_task') }}">
+    <button>Add Task</button></a></h1>
     {% for task in tasks %}
         <article class="media content-section">
           <div class="media-body">
