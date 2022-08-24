@@ -22,8 +22,8 @@ class User(db.Model, UserMixin):
 
 
 class Team(db.Model):
-    team_id = db.Column(db.String(50), primary_key=True)
-    team_name = db.Column(db.String(50))
+    team_name = db.Column(db.String(50), primary_key=True)
+    team_description = db.Column(db.String(1000))
 
 
 class Task(db.Model):

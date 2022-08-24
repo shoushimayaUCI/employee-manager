@@ -32,7 +32,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]= True
 
 from employee_manager.models import Team
 if not Team.query.first():
-	db.session.add(Team(team_id='newbies', team_name='newbies'))
+	db.session.add(Team(team_name='newbies', team_description='newbies'))
 	db.session.commit()
 from employee_manager import routes
 

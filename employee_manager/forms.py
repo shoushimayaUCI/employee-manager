@@ -46,7 +46,7 @@ class UpdateAccountForm(FlaskForm):
 	username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
 	email = StringField('Email', validators=[DataRequired(), Email()])
 	title = StringField('Job title', validators=[DataRequired(), Length(min=2, max=50)])
-	team_id = StringField('Team Id', validators=[DataRequired()])
+	team_name = StringField('Team Name', validators=[DataRequired()])
 	picture = FileField('Update Profile Picture', 
 		validators=[FileAllowed(['jpg', 'png'])])
 	submit = SubmitField('Update')
@@ -61,8 +61,8 @@ class UpdateAccountForm(FlaskForm):
 				User.query.filter_by(email=email.data).first()):
 			raise ValidationError('email taken')
 
-	def validate_team_id(self, team_id):
-		if not Team.query.filter_by(team_id=team_id.data).first():
+	def validate_team_name(self, team_name):
+		if not Team.query.filter_by(team_name=team_name.data).first():
 			raise ValidationError('the team does not exist')
 
 
@@ -89,11 +89,11 @@ class AnnouncementForm(FlaskForm):
 
 
 class TeamForm(FlaskForm):
-	team_id = StringField('Team Id', validators=[DataRequired(), Length(max=50)])
 	team_name = StringField('Team Name', validators=[DataRequired(), Length(max=50)])
+	team_description = StringField('Team Description', validators=[Length(max=1000)])
 	submit = SubmitField('Create Team')
 
-	def validate_team_id(self, team_id):
-		if Team.query.filter_by(team_id=team_id.data).first():
-			raise ValidationError('Team Id Taken')
+	def validate_team_name(self, team_name):
+		if Team.query.filter_by(team_name=team_name.data).first():
+			raise ValidationError('Team Name Taken')
 
