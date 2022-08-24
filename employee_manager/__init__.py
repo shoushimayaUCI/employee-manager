@@ -3,9 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager 
 from flask_sqlalchemy import SQLAlchemy
+from flask_restful import Api
 
 
 app = Flask(__name__)
+api = Api(app)
 app.config['SECRET_KEY'] = 'bf44ed945ec08fb0b84b1c7b9aed0325'
 db = SQLAlchemy(app)
 db.create_all()

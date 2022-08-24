@@ -1,43 +1,46 @@
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, make_response
 from flask_login import login_user, logout_user, current_user, login_required
 from sqlalchemy.orm import aliased
 import secrets
 from PIL import Image
 import os 
+from flask_restful import Resource
 
-from employee_manager import app, db, bcrypt
+from employee_manager import app, db, bcrypt, api
 from employee_manager.forms import *
 from employee_manager.models import *
 
-@app.route("/")
-@app.route("/welcome")
-def welcome():
-    return render_template('welcome.html')
+class welcome(Resource):
+    def get(self):
+        return make_response(render_template('welcome.html'))
 
 
-@app.route("/home")
-@login_required
-def home():
-    return render_template('home.html', tasks=Task.query.filter_by(person=current_user.email))
+class home(Resource):
+    @login_required
+    def get(self):
+        return make_response(render_template('home.html', tasks=Task.query.filter_by(person=current_user.email)))
 
-@app.route("/about")
-def about():
-    return render_template('about.html', title='About')
+class about(Resource):
+    def get(self):
+        return make_response(render_template('about.html', title='About'))
 
 
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        if not form.team_id.data:
-            form.team_id.data = "newbie"
-        db.session.add(User(username=form.username.data, email=form.email.data, 
-            title=form.title.data, team_id=form.team_id.data, password=hashed_password))
-        db.session.commit()
-        flash(f'Account created for {form.username.data}!', 'success')
-        return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
+class register(Resource):
+    def get(self):
+        return make_response(render_template('register.html', title='Register', form=RegistrationForm()))
+
+    def post(self):
+        form=RegistrationForm()
+        if form.validate_on_submit():
+            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            if not form.team_id.data:
+                form.team_id.data = "newbie"
+            db.session.add(User(username=form.username.data, email=form.email.data, 
+                title=form.title.data, team_id=form.team_id.data, password=hashed_password))
+            db.session.commit()
+            flash(f'Account created for {form.username.data}!', 'success')
+            return make_response(redirect(url_for('login')))
+        return make_response(render_template('register.html', title='Register', form=form))
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -144,3 +147,8 @@ def new_team():
         flash('You successfully made a team!', 'success')
         return redirect(url_for('home'))
     return render_template('new_team.html', form=form)
+
+
+api.add_resource(welcome, "/")
+api.add_resource(register, '/register')
+api.add_resource(home, '/home')
