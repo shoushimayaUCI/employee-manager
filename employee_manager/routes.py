@@ -86,6 +86,10 @@ class account(Resource):
     def get(self):
         form = UpdateAccountForm()
         image_file = url_for('static', filename='profile-pics/'+current_user.image_file)
+        form.username.data = current_user.username
+        form.title.data = current_user.title
+        form.email.data = current_user.email
+        form.team_name.data = current_user.team_name
         return make_response(render_template('account.html', title='Account', form=form, image_file=image_file))
 
     @login_required
@@ -102,11 +106,6 @@ class account(Resource):
             db.session.commit()
             flash('your account has been updated', category='success')
             return make_response(redirect(url_for('account')))
-        elif request.method == 'GET':
-            form.username.data = current_user.username
-            form.title.data = current_user.title
-            form.email.data = current_user.email
-            form.team_name.data = current_user.team_name
         image_file = url_for('static', filename='profile-pics/'+current_user.image_file)
         return make_response(render_template('account.html', title='Account', form=form, image_file=image_file))
 
