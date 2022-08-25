@@ -14,7 +14,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     title = db.Column(db.String(50), unique=False, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
-    team_id = db.Column(db.String(10), nullable=False, default='newbies')
+    team_name = db.Column(db.String(10), db.ForeignKey('team.name'), nullable=False, default='newbies')
     password = db.Column(db.String(60), nullable=False)
 
     def __repr__(self):
@@ -22,8 +22,8 @@ class User(db.Model, UserMixin):
 
 
 class Team(db.Model):
-    team_name = db.Column(db.String(50), primary_key=True)
-    team_description = db.Column(db.String(1000))
+    name = db.Column(db.String(50), primary_key=True)
+    description = db.Column(db.String(1000))
 
 
 class Task(db.Model):
@@ -42,4 +42,4 @@ class Announcement(db.Model):
     author = db.Column(db.String(50), db.ForeignKey('user.email'), nullable=False)
     description = db.Column(db.Text())
     date_post = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    team = db.Column(db.String(50), db.ForeignKey('team.team_id'), nullable=False)
+    team = db.Column(db.String(50), db.ForeignKey('team.name'), nullable=False)

@@ -12,7 +12,7 @@ class RegistrationForm(FlaskForm):
 	email = StringField('Email', validators=[DataRequired(), Email()])
 	password = PasswordField('Password', validators=[DataRequired()])
 	title = StringField('Job title', validators=[DataRequired(), Length(min=2, max=50)])
-	team_id = StringField('Team Id')
+	team_name = StringField('Team Name')
 	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
 	submit = SubmitField('Sign up')
 
@@ -25,8 +25,8 @@ class RegistrationForm(FlaskForm):
 		if User.query.filter_by(email=email.data).first():
 			raise ValidationError('email already exists')
 
-	def validate_team_id(self, team_id):
-		if team_id.data and not Team.query.filter_by(team_id=team_id.data).first():
+	def validate_team_name(self, team_name):
+		if team_name.data and not Team.query.filter_by(team_name=team_name.data).first():
 			raise ValidationError('the team does not exist')
 
 
@@ -62,7 +62,7 @@ class UpdateAccountForm(FlaskForm):
 			raise ValidationError('email taken')
 
 	def validate_team_name(self, team_name):
-		if not Team.query.filter_by(team_name=team_name.data).first():
+		if not Team.query.filter_by(name=team_name.data).first():
 			raise ValidationError('the team does not exist')
 
 
@@ -84,16 +84,16 @@ class AnnouncementForm(FlaskForm):
 	submit = SubmitField('Create')
 
 	def validate_team(self, team):
-		if team.data and not Team.query.filter_by(team_name=team.data).first():
+		if team.data and not Team.query.filter_by(team=team.data).first():
 			raise ValidationError('team not found')
 
 
 class TeamForm(FlaskForm):
-	team_name = StringField('Team Name', validators=[DataRequired(), Length(max=50)])
-	team_description = StringField('Team Description', validators=[Length(max=1000)])
+	name = StringField('Team Name', validators=[DataRequired(), Length(max=50)])
+	description = StringField('Team Description', validators=[Length(max=1000)])
 	submit = SubmitField('Create Team')
 
-	def validate_team_name(self, team_name):
-		if Team.query.filter_by(team_name=team_name.data).first():
+	def validate_name(self, name):
+		if Team.query.filter_by(name=name.data).first():
 			raise ValidationError('Team Name Taken')
 
