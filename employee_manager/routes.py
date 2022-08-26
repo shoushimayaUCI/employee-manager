@@ -133,7 +133,7 @@ class announcements(Resource):
     @login_required
     def get(self):
         subquery = db.session.query(Announcement).filter(Announcement.team==current_user.team_name)
-        return make_response(render_template('announcements.html', announcements=subquery.all()))
+        return make_response(render_template('announcements.html', announcements=subquery.all(), author=current_user))
 
 
 class new_announcement(Resource):
@@ -174,8 +174,14 @@ class new_team(Resource):
 class teams(Resource):
     @login_required
     def get(self):
-        return make_response(render_template('teams.html',teams=Team.query.all()))
+        return make_response(render_template('teams.html', teams=Team.query.all()))
 
+class team(Resource):
+    @login_required
+    def get(self, team_name):
+        t = Team.query.filter_by(name=team_name)
+        users = User.query.filter_by(team_name=team_name)
+        return make_response(render_template('team.html', team=t[0], users=users))
 
 api.add_resource(welcome, "/")
 api.add_resource(register, '/register')
@@ -189,3 +195,4 @@ api.add_resource(announcements, '/announcements')
 api.add_resource(new_announcement, '/new_announcement')
 api.add_resource(new_team, '/new_team')
 api.add_resource(teams, '/teams')
+api.add_resource(team, '/team/<string:team_name>')

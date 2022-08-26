@@ -4,7 +4,12 @@
     <button>Make announcement</button></a></h1>
     {% for announcement in announcements %}
         <article class="media content-section">
+          <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile-pics/' + author.image_file) }}")>
           <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="#">{{ author.username }}</a>
+              <small class="text-muted">{{ announcement.date_post.strftime('%Y-%m-%d') }}</small>
+            </div>
             <h2><a class="article-title" href="#">{{ announcement.title }}</a></h2>
             <p class="article-content">{{ announcement.description }}</p>
           </div>

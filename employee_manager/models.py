@@ -14,7 +14,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     title = db.Column(db.String(50), unique=False, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
-    team_name = db.Column(db.String(10), db.ForeignKey('team.name'), nullable=False, default='newbies')
+    team_name = db.Column(db.String(50), db.ForeignKey('team.name'), nullable=False, default='newbies')
     password = db.Column(db.String(60), nullable=False)
 
     def __repr__(self):

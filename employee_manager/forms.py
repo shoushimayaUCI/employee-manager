@@ -26,7 +26,7 @@ class RegistrationForm(FlaskForm):
 			raise ValidationError('email already exists')
 
 	def validate_team_name(self, team_name):
-		if team_name.data and not Team.query.filter_by(team_name=team_name.data).first():
+		if team_name.data and not Team.query.filter_by(name=team_name.data).first():
 			raise ValidationError('the team does not exist')
 
 
@@ -84,7 +84,7 @@ class AnnouncementForm(FlaskForm):
 	submit = SubmitField('Create')
 
 	def validate_team(self, team):
-		if team.data and not Team.query.filter_by(team=team.data).first():
+		if team.data and not Team.query.filter_by(name=team.data).first():
 			raise ValidationError('team not found')
 
 
