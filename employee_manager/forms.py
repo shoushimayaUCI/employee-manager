@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextA
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_login import current_user
+from employee_manager import session
 
 from employee_manager.models import *
 
@@ -18,15 +19,15 @@ class RegistrationForm(FlaskForm):
 
 # function name has to be in this form, and it will be run when validate_on_submit is called from routes.py
 	def validate_username(self, username): 
-		if User.query.filter_by(username=username.data).first():
+		if session.query(User).filter_by(username=username.data).first():
 			raise ValidationError('username already exists')
 
 	def validate_email(self, email):
-		if User.query.filter_by(email=email.data).first():
+		if session.query(User).filter_by(email=email.data).first():
 			raise ValidationError('email already exists')
 
 	def validate_team_name(self, team_name):
-		if team_name.data and not Team.query.filter_by(name=team_name.data).first():
+		if team_name.data and not session.query(Team).filter_by(name=team_name.data).first():
 			raise ValidationError('the team does not exist')
 
 
@@ -38,7 +39,7 @@ class LoginForm(FlaskForm):
 	submit = SubmitField('Login')
 
 	def validate_email(self, email):
-		if not User.query.filter_by(email=email.data).first():
+		if not session.query(User).filter_by(email=email.data).first():
 			raise ValidationError('email does not exist')
 
 
@@ -53,16 +54,16 @@ class UpdateAccountForm(FlaskForm):
 
 	def validate_username(self, username):
 		if (username.data != current_user.username and 
-				User.query.filter_by(username=username.data).first()):
+				session.query(User).filter_by(username=username.data).first()):
 			raise ValidationError('username taken')
 	
 	def validate_email(self, email):
 		if (email.data != current_user.email and 
-				User.query.filter_by(email=email.data).first()):
+				session.query(User).filter_by(email=email.data).first()):
 			raise ValidationError('email taken')
 
 	def validate_team_name(self, team_name):
-		if not Team.query.filter_by(name=team_name.data).first():
+		if not session.query(Team).filter_by(name=team_name.data).first():
 			raise ValidationError('the team does not exist')
 
 
@@ -73,7 +74,7 @@ class NewTaskForm(FlaskForm):
 	submit = SubmitField('Create')
 
 	def validate_person(self, person):
-		if person.data and not User.query.filter_by(email=person.data).first():
+		if person.data and not session.query(User).filter_by(email=person.data).first():
 			raise ValidationError('there is no user with this email address')
 
 
@@ -84,7 +85,7 @@ class AnnouncementForm(FlaskForm):
 	submit = SubmitField('Create')
 
 	def validate_team(self, team):
-		if team.data and not Team.query.filter_by(name=team.data).first():
+		if team.data and not session.query(Team).filter_by(name=team.data).first():
 			raise ValidationError('team not found')
 
 
@@ -94,6 +95,6 @@ class TeamForm(FlaskForm):
 	submit = SubmitField('Create Team')
 
 	def validate_name(self, name):
-		if Team.query.filter_by(name=name.data).first():
+		if session.query(Team).filter_by(name=name.data).first():
 			raise ValidationError('Team Name Taken')
 

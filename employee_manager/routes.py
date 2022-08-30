@@ -6,7 +6,7 @@ from PIL import Image
 import os 
 from flask_restful import Resource
 
-from employee_manager import app, db, bcrypt, api
+from employee_manager import app, session, bcrypt, api
 from employee_manager.forms import *
 from employee_manager.models import *
 
@@ -18,7 +18,7 @@ class welcome(Resource):
 class home(Resource):
     @login_required
     def get(self):
-        return make_response(render_template('home.html', tasks=Task.query.filter_by(person=current_user.email)))
+        return make_response(render_template('home.html', tasks=session.query(Task).filter_by(person=current_user.email)))
 
 class about(Resource):
     def get(self):
@@ -35,9 +35,9 @@ class register(Resource):
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             if not form.team_name.data:
                 form.team_name.data = "newbies"
-            db.session.add(User(username=form.username.data, email=form.email.data, 
+            session.add(User(username=form.username.data, email=form.email.data, 
                 title=form.title.data, team_name=form.team_name.data, password=hashed_password))
-            db.session.commit()
+            session.commit()
             flash(f'Account created for {form.username.data}!', 'success')
             return make_response(redirect(url_for('login')))
         return make_response(render_template('register.html', title='Register', form=form))
@@ -50,7 +50,7 @@ class login(Resource):
     def post(self):
         form = LoginForm()
         if form.validate_on_submit():
-            user = User.query.filter_by(email=form.email.data).first()
+            user = session.query(User).filter_by(email=form.email.data).first()
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user, remember=form.remember.data)
                 next_page = request.args.get('next')
@@ -103,7 +103,7 @@ class account(Resource):
             current_user.title = form.title.data
             current_user.email = form.email.data
             current_user.team_name = form.team_name.data
-            db.session.commit()
+            session.commit()
             flash('your account has been updated', category='success')
             return make_response(redirect(url_for('account')))
         image_file = url_for('static', filename='profile-pics/'+current_user.image_file)
@@ -121,9 +121,9 @@ class new_task(Resource):
         if form.validate_on_submit():
             if not form.person.data:
                 form.person.data = current_user.email
-            db.session.add(Task(title=form.title.data, description=form.description.data, 
+            session.add(Task(title=form.title.data, description=form.description.data, 
                 person=form.person.data))
-            db.session.commit()
+            session.commit()
             flash('The task has been created!', 'success')
             return make_response(redirect(url_for('home')))
         return make_response(render_template('new_task.html', form=form))
@@ -132,7 +132,7 @@ class new_task(Resource):
 class announcements(Resource):
     @login_required
     def get(self):
-        subquery = db.session.query(Announcement).filter(Announcement.team==current_user.team_name)
+        subquery = session.query(Announcement).filter_by(team=current_user.team_name)
         return make_response(render_template('announcements.html', announcements=subquery.all(), author=current_user))
 
 
@@ -147,9 +147,9 @@ class new_announcement(Resource):
         if form.validate_on_submit():
             if not form.team.data:
                 form.team.data = current_user.team_name
-            db.session.add(Announcement(title=form.title.data, author=current_user.email,
+            session.add(Announcement(title=form.title.data, author=current_user.email,
                 description=form.description.data, team=form.team.data))
-            db.session.commit()
+            session.commit()
             flash('You successfully made an announcement!', 'success')
             return make_response(redirect(url_for('announcements')))
         return make_response(render_template('new_announcement.html', form=form))
@@ -164,8 +164,8 @@ class new_team(Resource):
     def post(self):
         form = TeamForm()
         if form.validate_on_submit():
-            db.session.add(Team(name=form.name.data, description=form.description.data))
-            db.session.commit()
+            session.add(Team(name=form.name.data, description=form.description.data))
+            session.commit()
             flash('You successfully made a team!', 'success')
             return make_response(redirect(url_for('home')))
         return make_response(render_template('new_team.html', form=form))
@@ -174,13 +174,13 @@ class new_team(Resource):
 class teams(Resource):
     @login_required
     def get(self):
-        return make_response(render_template('teams.html', teams=Team.query.all()))
+        return make_response(render_template('teams.html', teams=session.query(Team).all()))
 
 class team(Resource):
     @login_required
     def get(self, team_name):
-        t = Team.query.filter_by(name=team_name)
-        users = User.query.filter_by(team_name=team_name)
+        t = session.query(Team).filter_by(name=team_name)
+        users = session.query(User).filter_by(team_name=team_name)
         return make_response(render_template('team.html', team=t[0], users=users))
 
 api.add_resource(welcome, "/")
