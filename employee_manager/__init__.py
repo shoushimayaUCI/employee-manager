@@ -12,8 +12,8 @@ api = Api(app)
 app.config['SECRET_KEY'] = 'bf44ed945ec08fb0b84b1c7b9aed0325'
 
 #engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
-engine = create_engine('postgresql://postgres:164Connemara@localhost:5432/employee-manager-db')
-#engine = create_engine('postgresql://postgres:164Connemara@db:5432/employee-manager-db')
+#engine = create_engine('postgresql://postgres:164Connemara@localhost:5432/employee-manager-db')
+engine = create_engine('postgresql://postgres:164Connemara@db:5432/employee-manager-db')
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()

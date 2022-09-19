@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    volumes:
+      - .:/app
+    links:
+      - db:db
+    depends_on:
+      #- pgadmin
+      - db
+
+  db:
+    image: postgres:14.5
+    restart: always
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    hostname: postgres
+    environment:
+      POSTGRES_PASSWORD: 164Connemara
+      POSTGRES_DB: employee-manager-db
+      PGDATA : /var/lib/postgresql/data/pgdata
+    depends_on:
+      - pgadmin
+
+  pgadmin:
+    image: 'dpage/pgadmin4'
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: shoushimaya@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: 164Connemara
+    ports:
+      - "5050:80"
+
+volumes:
+  dbdata:
+
+
+
+

@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h3><a href="{{ url_for('new_team') }}"><button>Create Team</button></a></h3>
+    {% for team in teams %}
+        <article class="media content-section">
+          <div class="media-body">
+            <h2><a class="article-title" href="{{ url_for('team', team_name=team.name) }}">{{ team.name }}</a></h2>
+            <p class="article-content">{{ team.description }}</p>
+          </div>
+        </article>
+    {% endfor %}
+{% endblock content %}
